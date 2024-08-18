@@ -1,12 +1,15 @@
 import contextlib
 from pathlib import Path
+from math import gcd
 
 import gradio as gr
 
 import modules.scripts as scripts
 from modules.ui_components import ToolButton
 
-from math import gcd
+
+IS_GRADIO_4 = version.parse(gr.__version__) >= version.parse("4.0.0")
+
 
 BASE_PATH = scripts.basedir()
 CALCULATOR_SYMBOL = "\U0001F4D0"  # 📐
@@ -445,22 +448,28 @@ class AspectRatioScript(scripts.Script):
 
                 with gr.Row():
                     # Calculate and Apply buttons
-                    arc_calc_height = gr.Button(value="Calculate Height").style(
-                        full_width=False
-                    )
+                    if IS_GRADIO_4:
+                        arc_calc_height = gr.Button(value="Calculate Height", scale=0)
+                    else:
+                        arc_calc_height = gr.Button(value="Calculate Height").style(full_width=False)
+
                     arc_calc_height.click(
                         lambda w2, w1, h1: (solve_aspect_ratio(w2, 0, w1, h1)),
                         inputs=[arc_desired_width, arc_width1, arc_height1],
                         outputs=[arc_desired_height],
                     )
-                    arc_calc_width = gr.Button(value="Calculate Width").style(
-                        full_width=False
-                    )
+
+                    if IS_GRADIO_4:
+                        arc_calc_width = gr.Button(value="Calculate Width", scale=0)
+                    else:
+                        arc_calc_width = gr.Button(value="Calculate Width").style(full_width=False)
+
                     arc_calc_width.click(
                         lambda h2, w1, h1: (solve_aspect_ratio(0, h2, w1, h1)),
                         inputs=[arc_desired_height, arc_width1, arc_height1],
                         outputs=[arc_desired_width],
                     )
+
                     arc_apply_params = gr.Button(value="Apply")
                     with contextlib.suppress(AttributeError):
                         if is_img2img:
