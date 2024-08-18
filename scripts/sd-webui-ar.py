@@ -67,6 +67,13 @@ class ARButton(ToolButton):
         return [self.res, self.res]
 
 
+# TODO: Replace inheritance with association
+# https://github.com/LEv145/--sd-webui-ar-plus/issues/24
+# Hack for Forge with Gradio 4.0; see `get_component_class_id` in `venv/lib/site-packages/gradio/components/base.py`
+for class_ in (ResButton, ARButton):
+    class_.__module__ = "modules.ui_components"
+
+
 def parse_aspect_ratios_file(filename):
     labels, values, comments = [], [], []
     file = Path(BASE_PATH, filename)
