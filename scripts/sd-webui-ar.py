@@ -25,7 +25,7 @@ is_reverse_logic_mode = False  # FIXME: Global value
 
 
 class ResButton(ToolButton):
-    def __init__(self, res=(512, 512), **kwargs):
+    def __init__(self, value, *, res=(512, 512), **kwargs):
         super().__init__(**kwargs)
 
         self.w, self.h = res
@@ -35,7 +35,7 @@ class ResButton(ToolButton):
 
 
 class ARButton(ToolButton):
-    def __init__(self, ar=1.0, **kwargs):
+    def __init__(self, value, *, ar=1.0, **kwargs):
         super().__init__(**kwargs)
 
         self.ar = ar
@@ -263,7 +263,7 @@ class AspectRatioScript(scripts.Script):
 
                 # Aspect Ratio buttons
                 ar_btns = [
-                    ARButton(ar=ar, value=label)
+                    ARButton(label, ar=ar)
                     for ar, label in zip(
                         self.aspect_ratios,
                         self.aspect_ratio_labels,
@@ -302,7 +302,7 @@ class AspectRatioScript(scripts.Script):
                 )
 
                 btns = [
-                    ResButton(res=res, value=label)
+                    ResButton(label, res=res)
                     for res, label in zip(self.res, self.res_labels)
                 ]
                 with contextlib.suppress(AttributeError):
@@ -591,6 +591,6 @@ def round_to_multiple(x, multiple):
 # TODO: Replace inheritance with association
 # https://github.com/LEv145/--sd-webui-ar-plus/issues/24
 # Hack for Forge with Gradio 4.0; see `get_component_class_id` in `venv/lib/site-packages/gradio/components/base.py`
-for class_ in (ResButton, ARButton):
-    class_.__module__ = "modules.ui_components"
-
+if IS_GRADIO_4:
+    for class_ in (ResButton, ARButton):
+        class_.__module__ = "modules.ui_components"
