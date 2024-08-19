@@ -26,7 +26,7 @@ is_reverse_logic_mode = False  # FIXME: Global value
 
 class ResButton(ToolButton):
     def __init__(self, value, *, res=(512, 512), **kwargs):
-        super().__init__(**kwargs)
+        super().__init__(value, **kwargs)
 
         self.w, self.h = res
 
@@ -36,7 +36,7 @@ class ResButton(ToolButton):
 
 class ARButton(ToolButton):
     def __init__(self, value, *, ar=1.0, **kwargs):
-        super().__init__(**kwargs)
+        super().__init__(value, **kwargs)
 
         self.ar = ar
 
