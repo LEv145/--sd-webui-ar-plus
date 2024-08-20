@@ -53,9 +53,9 @@ def create_resolution_buttons(
 
     for resolution, label in lst:
         button = ToolButton(label)
-        reset_func = create_reset_button_function(resolution)
+        function = create_reset_button_function(resolution)
         buttons.append(button)
-        functions[button] = reset_func
+        functions[button] = function
 
     return buttons, functions
 
@@ -68,9 +68,9 @@ def create_aspect_ratio_buttons(
 
     for aspect_ratio, label in lst:
         button = ToolButton(label)
-        reset_func = create_apply_button_function(aspect_ratio)
+        function = create_apply_button_function(aspect_ratio)
         buttons.append(button)
-        functions[button] = reset_func
+        functions[button] = function
 
     return buttons, functions
 
