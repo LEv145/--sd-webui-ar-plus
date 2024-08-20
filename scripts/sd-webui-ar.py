@@ -1,3 +1,4 @@
+import typing as t
 import contextlib
 from pathlib import Path
 from math import gcd
@@ -24,51 +25,54 @@ IMAGE_ROUNDING_MULTIPLIER = 4
 is_reverse_logic_mode = False  # FIXME: Global value
 
 
-class ResButton(ToolButton):
-    def __init__(self, value, *, res=(512, 512), **kwargs):
-        super().__init__(value, **kwargs)
+def create_reset_button_function(resolution: t.List[int]):
+    w, h = resolution
 
-        self.w, self.h = res
+    def wrapper():
+        return [w, h]
 
-    def reset(self):
-        return [self.w, self.h]
+    return wrapper
 
 
-class ARButton(ToolButton):
-    def __init__(self, value, *, ar=1.0, **kwargs):
-        super().__init__(value, **kwargs)
-
-        self.ar = ar
-
-    def apply(self, w, h):
+def create_apply_button_function(aspect_ratio: float):
+    def wrapper(w, h):
         if is_reverse_logic_mode:
-            w, h = self._reverse_calculate_sides(w, h)
+            w, h = reverse_calculate_sides(aspect_ratio, w, h)
         else:
-            w, h = self._calculate_sides(w, h)
+            w, h = calculate_sides(aspect_ratio, w, h)
+
         return list(map(round, [w, h]))
+    return wrapper
 
-    def _reverse_calculate_sides(self, w, h):
-        if self.ar > 1.0:
-            h = w / self.ar
-        elif self.ar < 1.0:
-            w = h * self.ar
-        else:
-            new_value = max([w, h])
-            w, h = new_value, new_value
-        return w, h
 
-    def _calculate_sides(self, w, h):
-        if self.ar > 1.0:
-            w = h * self.ar
-        elif self.ar < 1.0:
-            h = w / self.ar
-        else:
-            new_value = min([w, h])
-            w, h = new_value, new_value
-        return w, h
+def create_resolution_buttons(
+    lst: t.Iterable[t.Tuple[t.List[int], str]],
+) -> t.Tuple[t.List[ToolButton], t.Dict[str, t.Callable]]:
+    buttons = []
+    functions = {}
 
-    def reset(self, w, h):
-        return [self.res, self.res]
+    for resolution, label in lst:
+        button = ToolButton(label)
+        reset_func = create_reset_button_function(resolution)
+        buttons.append(button)
+        functions[button] = reset_func
+
+    return buttons, functions
+
+
+def create_aspect_ratio_buttons(
+    lst: t.Iterable[t.Tuple[float, str]],
+) -> t.Tuple[t.List[ToolButton], t.Dict[str, t.Callable]]:
+    buttons = []
+    functions = {}
+
+    for aspect_ratio, label in lst:
+        button = ToolButton(label)
+        reset_func = create_apply_button_function(aspect_ratio)
+        buttons.append(button)
+        functions[button] = reset_func
+
+    return buttons, functions
 
 
 def parse_aspect_ratios_file(filename):
@@ -202,6 +206,29 @@ def solve_aspect_ratio(w, h, n, d):
         return round(h * (n / d))
     else:
         return 0
+    
+
+
+def reverse_calculate_sides(aspect_ratio, w, h):
+    if aspect_ratio > 1.0:
+        h = w / aspect_ratio
+    elif aspect_ratio < 1.0:
+        w = h * aspect_ratio
+    else:
+        new_value = max([w, h])
+        w, h = new_value, new_value
+    return w, h
+
+
+def calculate_sides(aspect_ratio, w, h):
+    if aspect_ratio > 1.0:
+        w = h * aspect_ratio
+    elif aspect_ratio < 1.0:
+        h = w / aspect_ratio
+    else:
+        new_value = min([w, h])
+        w, h = new_value, new_value
+    return w, h
 
 
 class AspectRatioScript(scripts.Script):
@@ -261,27 +288,21 @@ class AspectRatioScript(scripts.Script):
                     elem_id="arsp__arc_hide_logic_button",
                 )
 
-                # Aspect Ratio buttons
-                ar_btns = [
-                    ARButton(label, ar=ar)
-                    for ar, label in zip(
-                        self.aspect_ratios,
-                        self.aspect_ratio_labels,
-                    )
-                ]
-
-                with contextlib.suppress(AttributeError):
-                    for b in ar_btns:
+                buttons, apply_functions = create_aspect_ratio_buttons(zip(self.aspect_ratios, self.aspect_ratio_labels))
+        
+                for button in buttons:
+                    with contextlib.suppress(AttributeError):
                         if is_img2img:
                             resolution = [self.i2i_w, self.i2i_h]
                         else:
                             resolution = [self.t2i_w, self.t2i_h]
 
-                        b.click(
-                            b.apply,
+                        button.click(
+                            apply_functions[button],
                             inputs=resolution,
                             outputs=resolution,
                         )
+
 
             self.read_resolutions()
             with gr.Row(
@@ -301,21 +322,21 @@ class AspectRatioScript(scripts.Script):
                     elem_id="arsp__arc_hide_calculator_button",
                 )
 
-                btns = [
-                    ResButton(label, res=res)
-                    for res, label in zip(self.res, self.res_labels)
-                ]
-                with contextlib.suppress(AttributeError):
-                    for b in btns:
+                
+                buttons, reset_functions = create_resolution_buttons(zip(self.res, self.res_labels))
+
+                for button in buttons:
+                    with contextlib.suppress(AttributeError):
                         if is_img2img:
                             resolution = [self.i2i_w, self.i2i_h]
                         else:
                             resolution = [self.t2i_w, self.t2i_h]
 
-                        b.click(
-                            b.reset,
+                        button.click(
+                            reset_functions[button],
                             outputs=resolution,
                         )
+   
 
             # Write button_titles.js with labels and comments read from aspect ratios and resolutions files
             button_titles = [self.aspect_ratio_labels + self.res_labels]
