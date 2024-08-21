@@ -510,8 +510,8 @@ class AspectRatioScript(scripts.Script):
                 is_reverse_logic_mode = not is_reverse_logic_mode
 
                 return [
-                    arc_show_logic.update(visible=False),
-                    arc_hide_logic.update(visible=True),
+                    gr.update(visible=False),
+                    gr.update(visible=True),
                 ]
 
             def _arc_hide_logic_update():
@@ -519,8 +519,8 @@ class AspectRatioScript(scripts.Script):
                 is_reverse_logic_mode = not is_reverse_logic_mode
 
                 return [
-                    arc_show_logic.update(visible=True),
-                    arc_hide_logic.update(visible=False),
+                    gr.update(visible=True),
+                    gr.update(visible=False),
                 ]
 
             arc_round.click(
