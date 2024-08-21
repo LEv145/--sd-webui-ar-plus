@@ -25,25 +25,6 @@ IMAGE_ROUNDING_MULTIPLIER = 4
 is_reverse_logic_mode = False  # FIXME: Global value
 
 
-
-def create_arc_show_logic_button(visible: bool = True):
-    return ToolButton(
-        value=REVERSE_LOGIC_SYMBOL,
-        visible=visible,
-        variant="secondary",
-        elem_id="arsp__arc_show_logic_button",
-    )
-
-
-def create_arc_hide_logic_button(visible: bool = False):
-    return ToolButton(
-        value=REVERSE_LOGIC_SYMBOL,
-        visible=visible,
-        variant="primary",
-        elem_id="arsp__arc_hide_logic_button",
-    )
-
-
 def create_reset_button_function(resolution: t.List[int]):
     w, h = resolution
 
@@ -294,8 +275,18 @@ class AspectRatioScript(scripts.Script):
             with gr.Row(
                 elem_id=f'arsp__{"img" if is_img2img else "txt"}2img_row_aspect_ratio'
             ):
-                arc_show_logic = create_arc_show_logic_button()
-                arc_hide_logic = create_arc_hide_logic_button()
+                arc_show_logic = ToolButton(
+                    value=REVERSE_LOGIC_SYMBOL,
+                    visible=True,
+                    variant="secondary",
+                    elem_id="arsp__arc_show_logic_button",
+                )
+                arc_hide_logic = ToolButton(
+                    value=REVERSE_LOGIC_SYMBOL,
+                    visible=False,
+                    variant="primary",
+                    elem_id="arsp__arc_hide_logic_button",
+                )
 
                 buttons, apply_functions = create_aspect_ratio_buttons(zip(self.aspect_ratios, self.aspect_ratio_labels))
         
@@ -519,8 +510,8 @@ class AspectRatioScript(scripts.Script):
                 is_reverse_logic_mode = not is_reverse_logic_mode
 
                 return [
-                    create_arc_show_logic_button(visible=False),
-                    create_arc_hide_logic_button(visible=True),
+                    arc_show_logic.update(visible=False),
+                    arc_hide_logic.update(visible=True),
                 ]
 
             def _arc_hide_logic_update():
@@ -528,8 +519,8 @@ class AspectRatioScript(scripts.Script):
                 is_reverse_logic_mode = not is_reverse_logic_mode
 
                 return [
-                    create_arc_show_logic_button(visible=True),
-                    create_arc_hide_logic_button(visible=False),
+                    arc_show_logic.update(visible=True),
+                    arc_hide_logic.update(visible=False),
                 ]
 
             arc_round.click(
