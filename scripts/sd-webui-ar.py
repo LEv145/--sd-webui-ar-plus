@@ -605,13 +605,3 @@ class AspectRatioScript(scripts.Script):
 
 def round_to_multiple(x, multiple):
     return multiple * round(x / multiple)
-
-
-# Forge patches
-
-# TODO: Replace inheritance with association
-# https://github.com/LEv145/--sd-webui-ar-plus/issues/24
-# Hack for Forge with Gradio 4.0; see `get_component_class_id` in `venv/lib/site-packages/gradio/components/base.py`
-if IS_GRADIO_4:
-    for class_ in (ResButton, ARButton):
-        class_.__module__ = "modules.ui_components"
