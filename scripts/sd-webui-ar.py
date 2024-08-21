@@ -36,7 +36,7 @@ def create_arc_show_logic_button(visible: bool = True):
 
 
 def create_arc_hide_logic_button(visible: bool = False):
-        return ToolButton(
+    return ToolButton(
         value=REVERSE_LOGIC_SYMBOL,
         visible=False,
         variant="primary",
