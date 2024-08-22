@@ -449,11 +449,17 @@ class AspectRatioScript(scripts.Script):
                                     arc_get_image_dim = ToolButton(
                                         value=IMAGE_DIMENSIONS_SYMBOL
                                     )
+
+                                    if IS_GRADIO_4:
+                                        js_parameter = dict(js=current_tab_image)
+                                    else:
+                                        js_parameter = dict(_js=current_tab_image)
+
                                     arc_get_image_dim.click(
                                         fn=get_dims,
                                         inputs=self.image,
                                         outputs=[arc_width1, arc_height1],
-                                        _js=current_tab_image,
+                                        **js_parameter,
                                     )
 
                     # Update aspect ratio display on change
