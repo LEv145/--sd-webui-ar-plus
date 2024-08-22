@@ -1,5 +1,7 @@
 # Stable Diffusion WebUI Aspect Ratio selector
 
+![Work on forge](https://img.shields.io/badge/FORGE-F16511?style=plastic&label=WORK%20ON&labelColor=3F4958)
+
 Extension for [AUTOMATIC1111/stable-diffusion-webui](https://github.com/AUTOMATIC1111/stable-diffusion-webui.git) adding image aspect ratio selector buttons.
 
 
